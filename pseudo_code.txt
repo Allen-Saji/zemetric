@@ -1,0 +1,79 @@
+I can think of three functions here
+1. connnect(device, consumption)
+2. disconnect(device)
+3. allocate_power(device, consumption)
+4. reallocate_consumption(device, consumption_change)
+
+MAX_POWER_CAPACITY = 92
+MAX_DEVICE_C0NSUMPTION = 40
+current_consumption = 0
+device_list<device, consumption> = {}  //devices that are currently in use
+
+
+connect(device, consumption) {
+    if device is in queue {
+        return device is already connected
+    }
+    power_allocated = allocate_power(device, consumption)
+    device_list.add(device, power_allocated)
+    return
+}
+
+disconnect(device) {
+    if device not found in device_list{
+        return device not found
+    }
+
+    current_consumption -= device consumption
+    device_list.remove(device)
+
+    //relallocate the freed up resources in FIFO order
+    iterate through device_list
+    while (current_consumption == MAX_POWER_CAPACITY || i = device_list.length() - 1) {
+        if(device_list[i].power < MAX_DEVICE_C0NSUMPTION) {
+            device_list[i].power += (MAX_DEVICE_C0NSUMPTION - device_list[i].power)
+            current_consumption += (MAX_DEVICE_C0NSUMPTION - device_list[i].power)
+            i++
+        }
+    }
+}
+
+allocate_power(device, consumption) {
+    available_power = MAX_POWER_CAPACITY - current_consumption //>=0
+    power_allocated = MIN(available_power, consumption)
+    current_consumption += power_allocated
+    return power_allocated
+}
+
+reallocate_consumption(device, consumption_change) { 
+    //consumption_change = old consumption - new consumption (so can be -ve or +ve) 
+    if device not found in device_list {
+        return device not found
+    }
+
+    if (consumption_change < 0) { //device needs more power
+        allocate_power(device, new consumption)
+        return
+    }
+
+    if (consumption_change > 0) { //device power consumption dropped
+        current_consumption -= device consumption
+        allocate_power(device, new consumption)
+    }
+
+    //relallocate the freed up resources in FIFO order
+    iterate through device_list
+    while (current_consumption == MAX_POWER_CAPACITY || i = device_list.length() - 1) {
+        if(device_list[i].power < MAX_DEVICE_C0NSUMPTION) {
+            device_list[i].power += (MAX_DEVICE_C0NSUMPTION - device_list[i].power)
+            current_consumption += (MAX_DEVICE_C0NSUMPTION - device_list[i].power)
+            i++
+        }
+    }
+
+
+}
+
+
+I didn't really test this by writing real code, but I feel like I have covered most cases :)
+
